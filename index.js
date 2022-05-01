@@ -50,4 +50,36 @@ const openPrompt = () => {
     })
 };
 
+const viewDept = () => {
+    let sql = `SELECT department_name AS "Department" FROM department`;
+    connection.query(sql, (err, result) => {
+        if (err) throw err;
+        console.table('Departments', result);
+    })
+};
+
+const viewRoles = () => {
+    let sql = `SELECT title as "Role" FROM roles`
+    connection.query(sql, (err, result) => {
+        if (err) throw err;
+        console.table('Roles', result)
+    })
+};
+
+const viewEmp = () => {
+    let sql = `SELECT employee.id,
+               employee.first_name,
+               employee.last_name,
+               role.title,
+               department.department_name AS "Department",
+               role.salary
+               FROM employee, role, department
+               WHERE department.id = role.department_id
+               AND role.id = employee.role_id`;
+    connection.query(sql, (err, result) => {
+        if (err) throw err;
+        console.table('Employees', result);
+    })
+};
+
 openPrompt();

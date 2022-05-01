@@ -21,6 +21,6 @@ CREATE TABLE employee(
     last_name VARCHAR(30) NOT NULL,
     role_id INT NOT NULL,
     manager_id INT,
-    FOREIGN KEY(role_id) REFERENCES roles(id),
-    FOREIGN KEY (manager_id) REFERENCES employee(id)
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+    FOREIGN KEY (manager_id) REFERENCES employee(id) ON UPDATE CASCADE
 );
