@@ -55,6 +55,7 @@ const viewDept = () => {
     connection.query(sql, (err, result) => {
         if (err) throw err;
         console.table('Departments', result);
+        openPrompt();
     })
 };
 
@@ -62,7 +63,8 @@ const viewRoles = () => {
     let sql = `SELECT title as "Role" FROM roles`
     connection.query(sql, (err, result) => {
         if (err) throw err;
-        console.table('Roles', result)
+        console.table('Roles', result);
+        openPrompt();
     })
 };
 
@@ -79,7 +81,47 @@ const viewEmp = () => {
     connection.query(sql, (err, result) => {
         if (err) throw err;
         console.table('Employees', result);
+        openPrompt();
     })
 };
+
+const addDept = () => {
+    let newD = [
+        {
+            type: 'input',
+            name: 'dept',
+            message: 'Please enter the name of the new department'
+        }
+    ];
+
+    inquirer.prompt(newD)
+    .then(response => {
+        const sql = `INSERT INTO department (department_name) VALUES (?)`;
+        connection.query(sql, [response.dept], (err, res) => {
+            if (err) throw err;
+            console.log(`Successfully added ${response.dept} department`);
+            openPrompt();
+        });
+    })
+    .catch(err => {
+        console.log(err);
+    })
+};
+
+const addRole = () => {
+    const departments = [];
+    const sql1 = 'SELECT * FROM DEPARTMENT';
+    connection.query(sql1, (err, res) => {
+        if (err) throw err;
+    })
+}
+
+const addEmp = () => {
+
+}
+
+const updateEmpRole = () => {
+
+}
 
 openPrompt();
