@@ -51,7 +51,8 @@ const openPrompt = () => {
 };
 
 const viewDept = () => {
-    let sql = `SELECT department_name AS "Department" FROM department`;
+    let sql = `SELECT department.id, 
+               department_name AS "Department" FROM department`;
     connection.query(sql, (err, result) => {
         if (err) throw err;
         console.table('Departments', result);
@@ -60,7 +61,12 @@ const viewDept = () => {
 };
 
 const viewRoles = () => {
-    let sql = `SELECT title as "Role" FROM roles`
+    let sql = `SELECT roles.id, 
+               roles.title,
+               roles.salary,
+               department.department_name AS department
+               FROM roles
+               INNER JOIN department ON roles.department_id = department.id`;
     connection.query(sql, (err, result) => {
         if (err) throw err;
         console.table('Roles', result);
@@ -72,12 +78,12 @@ const viewEmp = () => {
     let sql = `SELECT employee.id,
                employee.first_name,
                employee.last_name,
-               role.title,
+               roles.title,
                department.department_name AS "Department",
-               role.salary
-               FROM employee, role, department
-               WHERE department.id = role.department_id
-               AND role.id = employee.role_id`;
+               roles.salary
+               FROM employee, roles, department
+               WHERE department.id = roles.department_id
+               AND roles.id = employee.role_id`;
     connection.query(sql, (err, result) => {
         if (err) throw err;
         console.table('Employees', result);
@@ -109,12 +115,52 @@ const addDept = () => {
 };
 
 const addRole = () => {
-    const departments = [];
-    const sql1 = 'SELECT * FROM DEPARTMENT';
+    const departmentArr = [];
+    const sql1 = 'SELECT * FROM department';
     connection.query(sql1, (err, res) => {
         if (err) throw err;
-    })
-}
+
+        res.forEach(dept => {
+            let deptObj = {
+                name: dept.name,
+                id: dept.id
+            }
+            departmentArr.push(deptObj);
+        });
+
+        let questions = [
+            {
+                type: 'input',
+                name: 'title',
+                message: 'Please enter the title of the new role.'
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'Please enter the salary of the new role.'
+            },
+            {
+                type: 'list',
+                name: 'department',
+                choices: departmentArr,
+                message: 'Please select the department this role belongs to.'
+            }
+        ];
+
+        inquirer.prompt(questions)
+        .then(response => {
+            const sql2 = 'INSERT INTO roles (title, salary, department_id) VALUES (?)';
+            connection.query(sql2, [[response.title, response.salary, response.department]], (err, res) => {
+                if (err) throw err;
+                console.log(`Successfully added ${response.title} role!`);
+                openPrompt();
+            });
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    });
+};
 
 const addEmp = () => {
 
